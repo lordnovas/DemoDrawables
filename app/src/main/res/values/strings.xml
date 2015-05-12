@@ -3,4 +3,6 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_shape_draw">ShapeDrawActivity</string>
+    <string name="title_activity_move_shape">MoveShapeActivity</string>
 </resources>
