@@ -8,23 +8,16 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/moveShape"
-        android:text="Make Sqr"
-        android:onClick="makeSqr"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/changeShape"
+        android:id="@+id/makeCircle"
         android:text="Make Circle"
-        android:onClick="makeCircle"
-        android:layout_below="@id/moveShape"/>
+        android:onClick="makeCircle"/>
+
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/clear"
-        android:layout_below="@+id/changeShape"
+        android:layout_below="@+id/makeCircle"
         android:text="Clear"
         android:onClick="clear"/>
 

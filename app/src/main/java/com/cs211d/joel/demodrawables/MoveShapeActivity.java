@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -38,17 +39,11 @@ public class MoveShapeActivity extends ActionBarActivity
 
     public void makeCircle(View view)
     {
-        msv.makeCircle();
-        msv.move();
+        msv.choice = msv.CIRCLE;
+
         msv.invalidate();
     }
 
-    public void makeSqr(View view)
-    {
-        msv.makeSqr();
-        msv.move();
-        msv.invalidate();
-    }
 
     public void clear(View view)
     {
@@ -62,28 +57,20 @@ public class MoveShapeActivity extends ActionBarActivity
     {
         private Random rand = new Random();
         private Paint p = new Paint();
-        Paint p2 = new Paint();
-        int screenHeight;
-        int screenWidth;
-        private boolean isCircle = false;
-        private final int SQR = 0;
-        private final int CIRCLE =1;
-        private final int CLEAR = 2;
+        private int screenHeight;
+        private int screenWidth;
+        private final int CIRCLE = 0;
+        private final int CLEAR = 1;
         private int choice =0;
+        private ArrayList<Circle> circles = new ArrayList<>();
 
-
-        private int h ,w,r,left,right,top,bottom;
 
         public MoveShapeView(Context context)
         {
             super(context);
-            this.p.setColor(Color.rgb(getRandomNum(25, 255),
-                    getRandomNum(1, 255), getRandomNum(25, 255)));
-            choice = 2;
-
+            p.setColor(Color.WHITE);
+            choice = CLEAR;
         }
-
-        //todo setup buttons and complete switch commands
 
         @Override
         protected void onDraw(Canvas canvas)
@@ -91,17 +78,11 @@ public class MoveShapeActivity extends ActionBarActivity
             screenHeight = canvas.getHeight();
             screenWidth = canvas.getWidth();
 
-
             switch (choice)
             {
-                case SQR:
-                {
-                    canvas.drawRect(left, top, right, bottom, p2);
-                    break;
-                }
                 case CIRCLE:
                 {
-                    canvas.drawCircle(w, h, r, p);
+                    makeCircle(canvas);
                     break;
                 }
                 case CLEAR:
@@ -115,42 +96,69 @@ public class MoveShapeActivity extends ActionBarActivity
 
         public void clearScreen()
         {
-            choice = 2;
+            //set choice to Clear
+            choice = CLEAR;
+
+            //delete all circles
+            circles.clear();
         }
 
-        public void makeCircle()
+        public void makeCircle(Canvas canvas)
         {
-            choice  =1;
+            //set choice to 1 to enable circles drawn on screen
+
+            //Create Circle Object
+            Circle c = new Circle();
+            c.setR(getRandomNum(1,200));
+            c.setX(getRandomNum(1, screenWidth));
+            c.setY(getRandomNum(1, screenHeight));
+
+            //Add newly created circle to Circle Array
+            circles.add(c);
+
+            p.setColor(Color.WHITE);
+            //Draw all Circles from
+            for(Circle circle:circles)
+            {
+                checkBounds(circle);
+                canvas.drawCircle(circle.getX(), circle.getY(),
+                        circle.getR(),circle.getP());
+            }
         }
 
-        public void makeSqr()
+        public void checkBounds(Circle circle)
         {
-            choice = 0;
+            Rect bounds = circle.getBounds();
+
+
+            if (bounds.left < 0)
+            {
+                //do something
+                Message.message(getApplicationContext(),
+                        "Bounding Box left out of bounds" + screenWidth);
+                    circle.setX(getRandomNum(5, (circle.getX() + screenWidth) / 2));
+            }
+            else if(bounds.right > screenWidth)
+            {
+                Message.message(getApplicationContext(),
+                        "Bounding Box Right out of bounds" + screenWidth);
+                circle.setX(getRandomNum(1,(screenWidth - circle.getX())/2));
+            }else if(bounds.top < 0)
+            {
+
+                Message.message(getApplicationContext(),
+                        "Bounding Box Top of bounds" + screenHeight);
+                circle.setY(getRandomNum(1, (screenHeight + circle.getX()) / 2));
+            }
         }
 
-        public void move()
-        {
-            h = getRandomNum(50, screenHeight - 50);
-            w = getRandomNum(10, screenWidth - 10);
-            r = getRandomNum(1, 200);
-            p.setColor(Color.rgb(getRandomNum(25, 255),
-                    getRandomNum(1, 255), getRandomNum(25, 255)));
-            p2.setColor(Color.rgb(getRandomNum(25, 255),
-                    getRandomNum(1, 255), getRandomNum(25, 255)));
-
-
-            left = getRandomNum(1,screenWidth);
-            top = getRandomNum(1,screenHeight);
-            right = left + left;
-            bottom = top + top;
-
-        }
 
         /***********getRandomNum()*********************************/
         public int getRandomNum(int min, int max)
         {
             //Generate random int between min-max
-            return rand.nextInt(max-min)+min;
+            System.out.println("Max Value is " + max + "Min Value is " + min);
+            return rand.nextInt(Math.abs(max) - min)+ min;
         }
 
     }
