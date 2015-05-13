@@ -128,9 +128,9 @@ public class MoveShapeActivity extends ActionBarActivity
 
         public void checkBounds(Circle circle)
         {
+            /*todo - upper/lower left corner and upper/lower right corner
+             */
             Rect bounds = circle.getBounds();
-
-
             if (bounds.left < 0)
             {
                 //do something
@@ -145,7 +145,11 @@ public class MoveShapeActivity extends ActionBarActivity
                 circle.setX(getRandomNum(1,(screenWidth - circle.getX())/2));
             }else if(bounds.top < 0)
             {
-
+                Message.message(getApplicationContext(),
+                        "Bounding Box Top of bounds" + screenHeight);
+                circle.setY(getRandomNum(1, (screenHeight + circle.getX()) / 2));
+            }else if(bounds.bottom > screenHeight)
+            {
                 Message.message(getApplicationContext(),
                         "Bounding Box Top of bounds" + screenHeight);
                 circle.setY(getRandomNum(1, (screenHeight + circle.getX()) / 2));
