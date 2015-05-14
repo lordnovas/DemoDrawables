@@ -70,13 +70,11 @@ public class Circle
     }
 
 
-
-
     /***********getRandomNum()*********************************/
     public int getRandomNum(int min, int max)
     {
         //Generate random int between min-max
-        return rand.nextInt(max-min)+min;
+        return min + rand.nextInt((Math.abs(max - min) + 1));
     }
 
 }

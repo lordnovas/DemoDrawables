@@ -4,12 +4,16 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ public class MoveShapeActivity extends ActionBarActivity
 {
 
     protected static final String TAG = "MoveShapeActivity";
+    public FrameLayout bt_panel;
     MoveShapeView  msv;
 
     @Override
@@ -30,7 +35,10 @@ public class MoveShapeActivity extends ActionBarActivity
 
         final RelativeLayout frame = (RelativeLayout) findViewById(R.id.moveFrame);
 
+        bt_panel = (FrameLayout) findViewById(R.id.bt_panel);
+        bt_panel.setBackgroundColor(Color.WHITE);
         msv = new MoveShapeView(getApplicationContext());
+
         frame.addView(msv);
 
 
@@ -41,7 +49,7 @@ public class MoveShapeActivity extends ActionBarActivity
     {
         msv.choice = msv.CIRCLE;
 
-        msv.invalidate();
+        msv.makeCircle();
     }
 
 
@@ -65,6 +73,7 @@ public class MoveShapeActivity extends ActionBarActivity
         private ArrayList<Circle> circles = new ArrayList<>();
 
 
+
         public MoveShapeView(Context context)
         {
             super(context);
@@ -78,11 +87,16 @@ public class MoveShapeActivity extends ActionBarActivity
             screenHeight = canvas.getHeight();
             screenWidth = canvas.getWidth();
 
+            canvas.drawColor(Color.WHITE);
             switch (choice)
             {
                 case CIRCLE:
                 {
-                    makeCircle(canvas);
+                    for(Circle circle:circles)
+                    {
+                        canvas.drawCircle(circle.getX(), circle.getY(),
+                                circle.getR(),circle.getP());
+                    }
                     break;
                 }
                 case CLEAR:
@@ -91,6 +105,43 @@ public class MoveShapeActivity extends ActionBarActivity
                     break;
                 }
             }
+
+        }
+
+
+        @Override
+        protected void onMeasure (int widthMeasureSpec, int heightMeasureSpec)
+        {
+
+            int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+            int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+            int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+            int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+            int width;
+            int height;
+
+            //Measure Width
+            if ((widthMode == MeasureSpec.EXACTLY)
+                    ||(widthMode == MeasureSpec.AT_MOST))
+            {
+                width = widthSize;
+            } else{
+                //Be whatever you want
+                width = widthSize;
+            }
+
+            //Measure Height
+            if ((heightMode == MeasureSpec.EXACTLY)
+                    ||(heightMode == MeasureSpec.AT_MOST))
+             {
+                height = heightSize;
+            } else {
+                height = heightSize;
+            }
+
+            setMeasuredDimension(width,
+                    height- bt_panel.getHeight());
 
         }
 
@@ -103,66 +154,69 @@ public class MoveShapeActivity extends ActionBarActivity
             circles.clear();
         }
 
-        public void makeCircle(Canvas canvas)
+        public void makeCircle()
         {
             //set choice to 1 to enable circles drawn on screen
 
             //Create Circle Object
             Circle c = new Circle();
-            c.setR(getRandomNum(1,200));
+            c.setR(getRandomNum(1, 200));
             c.setX(getRandomNum(1, screenWidth));
             c.setY(getRandomNum(1, screenHeight));
 
             //Add newly created circle to Circle Array
             circles.add(c);
 
-            p.setColor(Color.WHITE);
-            //Draw all Circles from
+            //check newly created circle bounds and fix it
             for(Circle circle:circles)
-            {
                 checkBounds(circle);
-                canvas.drawCircle(circle.getX(), circle.getY(),
-                        circle.getR(),circle.getP());
-            }
+
+            //redraw
+            invalidate();
         }
 
         public void checkBounds(Circle circle)
         {
-            /*todo - upper/lower left corner and upper/lower right corner
+            /**
+             * Check bounds of the Circle
+             * if the original bounds are off screen
+             * push/pull circle to the screen
              */
             Rect bounds = circle.getBounds();
+
+            int x = circle.getX();
+            int y = circle.getY();
+
             if (bounds.left < 0)
             {
-                //do something
-                Message.message(getApplicationContext(),
-                        "Bounding Box left out of bounds" + screenWidth);
-                    circle.setX(getRandomNum(5, (circle.getX() + screenWidth) / 2));
+                circle.setX(getRandomNum(5,
+                        (x + screenWidth) / 2));
             }
             else if(bounds.right > screenWidth)
             {
-                Message.message(getApplicationContext(),
-                        "Bounding Box Right out of bounds" + screenWidth);
-                circle.setX(getRandomNum(1,(screenWidth - circle.getX())/2));
-            }else if(bounds.top < 0)
-            {
-                Message.message(getApplicationContext(),
-                        "Bounding Box Top of bounds" + screenHeight);
-                circle.setY(getRandomNum(1, (screenHeight + circle.getX()) / 2));
-            }else if(bounds.bottom > screenHeight)
-            {
-                Message.message(getApplicationContext(),
-                        "Bounding Box Top of bounds" + screenHeight);
-                circle.setY(getRandomNum(1, (screenHeight + circle.getX()) / 2));
+                circle.setX(getRandomNum(5,
+                        (screenWidth - x)/2));
             }
-        }
+            else if(bounds.top < 0)
+            {
+                circle.setY(getRandomNum(5,
+                        (screenHeight + y )/ 2));
+            }
+            else if(bounds.bottom > screenHeight)
+            {
+                 circle.setY(getRandomNum(5,
+                        (screenHeight + y) / 2));
+            }
 
+        }
 
         /***********getRandomNum()*********************************/
         public int getRandomNum(int min, int max)
         {
             //Generate random int between min-max
             System.out.println("Max Value is " + max + "Min Value is " + min);
-            return rand.nextInt(Math.abs(max) - min)+ min;
+            return min + rand.nextInt(Math.abs((max - min)) + 1);
+
         }
 
     }
