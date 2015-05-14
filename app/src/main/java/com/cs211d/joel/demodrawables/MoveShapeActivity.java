@@ -84,16 +84,18 @@ public class MoveShapeActivity extends ActionBarActivity
         @Override
         protected void onDraw(Canvas canvas)
         {
-            screenHeight = canvas.getHeight();
-            screenWidth = canvas.getWidth();
-
             canvas.drawColor(Color.WHITE);
+
             switch (choice)
             {
                 case CIRCLE:
                 {
                     for(Circle circle:circles)
                     {
+//                        Rect box = checkBounds(circle);
+//                        p.setStrokeWidth(0);
+//                        p.setColor(Color.RED);
+//                        canvas.drawRect(box, p);
                         canvas.drawCircle(circle.getX(), circle.getY(),
                                 circle.getR(),circle.getP());
                     }
@@ -126,7 +128,8 @@ public class MoveShapeActivity extends ActionBarActivity
                     ||(widthMode == MeasureSpec.AT_MOST))
             {
                 width = widthSize;
-            } else{
+            }
+            else{
                 //Be whatever you want
                 width = widthSize;
             }
@@ -134,14 +137,19 @@ public class MoveShapeActivity extends ActionBarActivity
             //Measure Height
             if ((heightMode == MeasureSpec.EXACTLY)
                     ||(heightMode == MeasureSpec.AT_MOST))
-             {
+            {
                 height = heightSize;
-            } else {
+            }
+            else {
                 height = heightSize;
             }
 
+            screenWidth = width;
+            screenHeight = height-bt_panel.getHeight();
+
+            //Respect the bt_panels height so don't go past it
             setMeasuredDimension(width,
-                    height- bt_panel.getHeight());
+                    height - bt_panel.getHeight());
 
         }
 
@@ -149,7 +157,6 @@ public class MoveShapeActivity extends ActionBarActivity
         {
             //set choice to Clear
             choice = CLEAR;
-
             //delete all circles
             circles.clear();
         }
@@ -167,24 +174,30 @@ public class MoveShapeActivity extends ActionBarActivity
 
             //check newly created circle bounds and fix it
             for(Circle circle:circles)
+            {
                 checkBounds(circle);
-
+            }
             //redraw
             invalidate();
         }
 
-        public void checkBounds(Circle circle)
+        public Rect checkBounds(Circle circle)
         {
             /**
              * Check bounds of the Circle
              * if the original bounds are off screen
              * push/pull circle to the screen
              */
+
             Rect bounds = circle.getBounds();
 
             int x = circle.getX();
             int y = circle.getY();
 
+            Message.message(getApplicationContext(),
+                    "Circle X : " + circle.getX()
+                    + "\nCircle Y : " + circle.getY()
+                    + "\nCircle R : " + circle.getR());
             if (bounds.left < 0)
             {
                 circle.setX(getRandomNum(5,
@@ -206,13 +219,14 @@ public class MoveShapeActivity extends ActionBarActivity
                         (screenHeight + y) / 2));
             }
 
+            return bounds;
+
         }
 
         /***********getRandomNum()*********************************/
         public int getRandomNum(int min, int max)
         {
             //Generate random int between min-max
-            System.out.println("Max Value is " + max + "Min Value is " + min);
             return min + rand.nextInt(Math.abs((max - min)) + 1);
 
         }
