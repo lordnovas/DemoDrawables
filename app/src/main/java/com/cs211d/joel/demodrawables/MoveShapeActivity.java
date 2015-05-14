@@ -156,8 +156,6 @@ public class MoveShapeActivity extends ActionBarActivity
 
         public void makeCircle()
         {
-            //set choice to 1 to enable circles drawn on screen
-
             //Create Circle Object
             Circle c = new Circle();
             c.setR(getRandomNum(1, 200));
